@@ -1,9 +1,12 @@
 import './App.css';
+import React from 'react';
+import Register from './bricks/Register'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
     <div className="App">
-      <h1>Financio app</h1>
+      <Register></Register>
     </div>
   );
 }
