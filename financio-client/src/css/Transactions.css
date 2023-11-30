@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
+
+
+
+.Transactions {
+    font-family: 'Oxanium', sans-serif;
+    margin: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.24);
+    text-align: center;
+    padding: 20px;
+}
+
+.Transactions h1 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: bold;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: solid lightgray 1px;
+}
+
+
+.Table th {
+    text-align: left;
+}
+
+.Table td {
+    text-align: left;
+}
+
+.Table .Actions {
+    text-align: right;
+}
+
+.Actions .Button {
+    margin-left: 5px
+}
+
+.tHead h4{
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+}
