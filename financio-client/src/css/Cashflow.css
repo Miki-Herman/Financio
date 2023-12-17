@@ -1,0 +1,16 @@
+.Cashflow {
+    font-family: 'Oxanium', sans-serif;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.24);
+    text-align: center;
+    padding: 20px;
+}
+
+.Cashflow h1 {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: bold;
+    text-align: left;
+    padding: 1rem;
+    border-bottom: solid lightgray 1px;
+}
