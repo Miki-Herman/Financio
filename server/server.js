@@ -5,8 +5,11 @@ const connectDB = require('./middleware/dbConn');
 
 const app = express();
 const port = 3000;
-const dbUrl = process.env.DATABASE_URI;
 
+console.log(process.env.DATABASE_URI)
+
+// connect to DB
+connectDB();
 
 // transaction/delete
 app.delete("transaction/delete", (req, res) => {
@@ -53,7 +56,7 @@ app.get("savingGoal/get", (req, res) => {
     res.status(200).send("Working")
 });
 
-
-app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+mongoose.connection.once('open', () =>{
+    console.log('MongoDb connected');
+    app.listen(port, () => {console.log(`Server is running at http://localhost:${port}`)});
 });
