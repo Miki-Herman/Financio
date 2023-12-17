@@ -1,10 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const connectDB = require('./middleware/dbConn');
 
 const app = express();
 const port = 3000;
-const dbUrl = process.env.DATABASE_URI
+const dbUrl = process.env.DATABASE_URI;
 
 
 // transaction/delete
