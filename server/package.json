@@ -2,7 +2,7 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "mainRouter.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon server",
@@ -15,6 +15,9 @@
     "nodemon": "^3.0.2"
   },
   "dependencies": {
-    "express.js": "^1.0.0"
+    "dotenv": "^16.3.1",
+    "express.js": "^1.0.0",
+    "mongoose": "^8.0.3",
+    "package.json": "^0.0.0"
   }
 }
