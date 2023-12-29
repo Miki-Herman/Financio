@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.use(express.json());
 
-router.get("list", async (req, res) => {
+router.get("/list", async (req, res) => {
    try{
        const transTypes = await TransactionTypes.find();
 
