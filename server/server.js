@@ -9,6 +9,7 @@ const port = 4000;
 
 const transactionRouter = require("./routes/transactionRoute")
 const overviewRouter = require("./routes/overviewRoute")
+const categoryRouter = require("./routes/categoryRoute")
 
 app.use(cors());
 
@@ -23,6 +24,9 @@ app.use("/transaction", transactionRouter);
 
 // overview router
 app.use("/overview", overviewRouter)
+
+// category router
+app.use("/category", categoryRouter)
 
 // graph/get
 app.get("/graph/get", (req, res) => {
