@@ -88,7 +88,26 @@ router.get("/list",  async(req, res) => {
         "userId": req.query.userId
     }
     try {
-        const object = await Transaction.find(dtoIn);
+
+        // Get the current year and month
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1;
+
+        // Calculate the start and end dates of the current month
+        const startDate = new Date(currentYear, currentMonth - 1, 1);
+        const endDate = new Date(currentYear, currentMonth, 0);
+
+
+        const object = await Transaction.find(
+            {
+                userId: dtoIn.userId,
+                date: {
+                    $gte: startDate,
+                    $lt: endDate,
+                },
+            }
+        );
         const transTypes = await TransactionTypes.find();
 
         if (!object) {
