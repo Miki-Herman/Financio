@@ -9,4 +9,4 @@ const transactionType = new mongoose.Schema(
     }
 )
 
-module.exports = transactionType
+module.exports = mongoose.model("transactionType", transactionType)
