@@ -14,7 +14,7 @@ router.delete("/delete", async (req, res) => {
         const deletedObject = await Transaction.findOneAndDelete(dtoIn);
 
         // Check if the object exists
-        if (!deletedObject) {
+        if (!deletedObject) { 
             return res.status(404).json({ message: 'Object not found' });
         }
 
@@ -30,7 +30,7 @@ router.post("/create", async (req, res) => {
     const dtoIn = req.body;
     console.log(dtoIn)
     const date = new Date();
-    const new_trans = new Transaction(
+    const new_trans = new Transaction( 
         {
             "id": dtoIn.id,
             "amount": dtoIn.amount,

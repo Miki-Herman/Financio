@@ -45,6 +45,8 @@ function Transactions() {
         setEditTransaction(item); 
         setShowEditModal(true); 
     };
+
+    const [mode, setMode] = useState(null)
     
     const [editAmount, setEditAmount] = useState();
     const [editCategory, setEditCategory] = useState("");
@@ -87,6 +89,37 @@ function Transactions() {
     }
     const totalAmount = freeMoney(transactionData)
 
+    const createTransaction = async () => {
+        try {
+          const dToIn = {
+            amount: editAmount,
+            category: editCategory,
+            description: editDescription,
+            id: 1,
+            userId: 2
+          };
+      
+          const response = await fetch('http://localhost:4000/transaction/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dToIn),
+          });
+
+          console.log(dToIn)
+      
+          if (response.ok) {
+            closeEditModal();
+            setMode(null);
+          } else {
+            throw new Error('Chyba při aktualizaci transakce');
+          }
+        } catch (error) {
+          console.error('Chyba při aktualizaci transakce:', error);
+        }
+      };
+
     return(
         <div className="Transactions">
             <Stack direction="horizontal">
@@ -100,7 +133,7 @@ function Transactions() {
                         <th><h4>Category</h4></th>
                         <th><h4>Description</h4></th>
                         <th><h4>Date</h4></th>
-                        <th className="Actions"><Button variant="success"><Icon path={mdiCreditCardPlusOutline} size={1} /></Button></th>
+                        <th className="Actions"><Button variant="success" onClick={() => {openEditModal(); setMode("add")}}><Icon path={mdiCreditCardPlusOutline} size={1} /></Button ></th>
                     </tr>
                 {transactionData.map((item) => (
                     <tr key={item.id}>
@@ -109,7 +142,7 @@ function Transactions() {
                         <td>{item.description}</td>
                         <td>{new Date(item.date).toLocaleDateString()}</td>
                         <td className="Actions">
-                            <Button className="Button" variant="primary" onClick={() => openEditModal(item)}><Icon path={mdiSquareEditOutline} size={1} /></Button>
+                            <Button className="Button" variant="primary" onClick={() => {openEditModal(item); setMode("edit")}}><Icon path={mdiSquareEditOutline} size={1} /></Button>
                             <Button className="Button" variant="danger" onClick={() => deleteItem(item.id)}><Icon path={mdiTrashCanOutline} size={1} /></Button>
                         </td>
                     </tr>
@@ -118,9 +151,11 @@ function Transactions() {
             </Table>
         
 
-        <Modal show={showEditModal} onHide={closeEditModal}>
+        <Modal show={showEditModal} onHide={() => { closeEditModal(); setMode(null); }}>
             <Modal.Header>
-                <Modal.Title>Edit transaction</Modal.Title>
+                <Modal.Title>
+                    {mode === "add" ? (<>Add new transaction</>):(<>Edit transaction</>)}
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form>
@@ -141,7 +176,11 @@ function Transactions() {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={closeEditModal}>Cancel</Button>
-                <Button variant="primary" onClick={updateTransaction}>Update</Button>
+                {mode === "add" ? (
+                    <Button variant="primary" onClick={createTransaction}>Add</Button>
+                ):(
+                    <Button variant="primary" onClick={updateTransaction}>Update</Button>
+                )}
             </Modal.Footer>
         </Modal>
         </div>
