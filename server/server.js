@@ -7,6 +7,7 @@ const app = express();
 const port = 4000;
 
 const transactionRouter = require("./routes/transactionRoute")
+const overviewRouter = require("./routes/overviewRoute")
 
 // connect to DB
 connectDB();
@@ -17,15 +18,8 @@ app.get("/info", (req, res) => {
 // transaction router
 app.use("/transaction", transactionRouter);
 
-// overview/get
-app.get("/overview/get", (req, res) => {
-    res.status(200).send("Working")
-});
-
-// overview/list
-app.get("/overview/list", (req, res) => {
-    res.status(200).send("Working")
-});
+// overview router
+app.use("/overview", overviewRouter)
 
 // graph/get
 app.get("/graph/get", (req, res) => {
