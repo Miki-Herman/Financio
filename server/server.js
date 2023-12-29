@@ -6,31 +6,16 @@ const connectDB = require('./middleware/dbConn');
 const app = express();
 const port = 3000;
 
+const transactionRouter = require("./routes/transactionRoute")
+
 // connect to DB
 connectDB();
 app.get("/info", (req, res) => {
    res.send("working")
 });
 
-// transaction/delete
-app.delete("/transaction/delete", (req, res) => {
-    res.status(200).send("Working")
-});
-
-// transaction/create
-app.post("/transaction/create", (req, res) => {
-    res.status(200).send("Working")
-});
-
-// transaction/edit
-app.post("/transaction/edit", (req, res) => {
-    res.status(200).send("Working")
-});
-
-// transaction/list
-app.get("/transaction/list", (req, res) => {
-    res.status(200).send("Working")
-});
+// transaction router
+app.use("/transaction", transactionRouter);
 
 // overview/get
 app.get("/overview/get", (req, res) => {

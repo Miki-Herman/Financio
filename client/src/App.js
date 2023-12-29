@@ -11,7 +11,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Register/>}/>
-          <Route path="home" Component={Home}/>
+          <Route path="/home" Component={Home}/>
         </Routes>
       </Router>
     </div>
