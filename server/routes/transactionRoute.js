@@ -1,5 +1,6 @@
 const express = require('express');
 const Transaction = require('../models/transaction');
+const TransactionTypes = require('../models/transactionType')
 const router = express.Router();
 
 router.use(express.json());
@@ -28,21 +29,27 @@ router.delete("/delete", async (req, res) => {
 // transaction/create
 router.post("/create", async (req, res) => {
     const dtoIn = req.body;
-    console.log(dtoIn)
-    const date = new Date();
     const new_trans = new Transaction(
         {
             "id": dtoIn.id,
             "amount": dtoIn.amount,
             "category": dtoIn.category,
             "description": dtoIn.description,
-            "date": date,
+            "date": dtoIn.date,
             "userId": dtoIn.userId
         }
     );
 
     await new_trans.save()
-    res.send(new_trans)
+    res.send(
+        {
+            "error":
+                {
+                    "code":200,
+                    "msg": "Ok"
+                }
+        }
+    )
 });
 
 // transaction/edit
@@ -82,12 +89,13 @@ router.get("/list",  async(req, res) => {
     }
     try {
         const object = await Transaction.find(dtoIn);
+        const transTypes = await TransactionTypes.find();
 
         if (!object) {
             return res.status(404).json({ message: 'Object not found' });
         }
 
-        res.status(200).json({ message: 'Object retrieved successfully', data: object });
+        res.status(200).json({ message: 'Object retrieved successfully', data: object, types: transTypes });
     } catch (error) {
         console.error('Error retrieving object:', error);
         res.status(500).json({ message: 'Internal server error' });
