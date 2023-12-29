@@ -96,7 +96,8 @@ function Transactions() {
             category: editCategory,
             description: editDescription,
             id: 1,
-            userId: 2
+            userId: 2,
+            date: new Date()
           };
       
           const response = await fetch('http://localhost:4000/transaction/create', {

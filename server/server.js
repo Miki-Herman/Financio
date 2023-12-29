@@ -2,12 +2,15 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const connectDB = require('./middleware/dbConn');
+const cors = require('cors');
 
 const app = express();
 const port = 4000;
 
 const transactionRouter = require("./routes/transactionRoute")
 const overviewRouter = require("./routes/overviewRoute")
+
+app.use(cors());
 
 // connect to DB
 connectDB();
