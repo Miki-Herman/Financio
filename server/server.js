@@ -35,7 +35,7 @@ app.get("/graph/get", (req, res) => {
 
 // savingGoal/edit
 app.post("/savingGoal/edit", (req, res) => {
-    res.status(200).send("Working")
+    res.status(200).send("Not working")
 });
 
 // savingGoal/get
