@@ -1,6 +1,7 @@
 const express = require('express');
 const Transaction = require('../models/transaction');
 const router = express.Router();
+const getMonthName = require("../middleware/getMonth")
 
 router.use(express.json());
 
@@ -36,7 +37,31 @@ router.get("/get", async (req, res) => {
 
 // overview/list
 router.get("/list", async (req, res) => {
-    res.status(200).send("Working")
+    try {
+        const transactions = await Transaction.find({});
+
+        // Organize transactions by month and year
+        const transactionsByMonthYear = {};
+
+        transactions.forEach((transaction) => {
+            const isoDate = transaction.date;
+
+            // Extract month and year from the ISO date
+            const date = new Date(isoDate);
+            const monthYearKey = `${getMonthName(date.getMonth())}${date.getFullYear()}`;
+
+            if (!transactionsByMonthYear[monthYearKey]) {
+                transactionsByMonthYear[monthYearKey] = [];
+            }
+
+            transactionsByMonthYear[monthYearKey].push(transaction);
+        });
+
+        res.json(transactionsByMonthYear);
+    } catch (error) {
+        console.error('Error retrieving transactions:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 });
 
 module.exports = router;
