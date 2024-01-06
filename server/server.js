@@ -10,7 +10,8 @@ const port = 4000;
 const transactionRouter = require("./routes/transactionRoute")
 const overviewRouter = require("./routes/overviewRoute")
 const categoryRouter = require("./routes/categoryRoute")
-
+const savingGoalRouter = require ("./routes/savingGoalRoute")
+const graphRouter = require ("./routes/graphRoute")
 app.use(cors());
 
 // connect to DB
@@ -29,19 +30,12 @@ app.use("/overview", overviewRouter)
 app.use("/category", categoryRouter)
 
 // graph/get
-app.get("/graph/get", (req, res) => {
-    res.status(200).send("Working")
-});
+app.use("/graph", graphRouter);
 
-// savingGoal/edit
-app.post("/savingGoal/edit", (req, res) => {
-    res.status(200).send("Not working")
-});
+// savingGoal router
+app.use("/savingGoal", savingGoalRouter)
 
-// savingGoal/get
-app.get("/savingGoal/get", (req, res) => {
-    res.status(200).send("Working")
-});
+
 
 mongoose.connection.once('open', () =>{
     console.log('MongoDb connected');
