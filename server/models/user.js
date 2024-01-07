@@ -4,7 +4,6 @@ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const user = new mongoose.Schema(
     {
-        "id": { type: Number, required: true },
         email: { 
             type: String, 
             required: true,
@@ -15,8 +14,19 @@ const user = new mongoose.Schema(
                 message: props => `${props.value} is not a valid email address!`
             }
         },
-        "password": { type: String, required: true },
-        "role": { type: Number, required: true }
+        password: { 
+            type: String, 
+            required: function() {
+                return !this.isGoogleUser;
+            }
+        },
+        googleId: {
+            type: String,
+            required: function() {
+                return this.isGoogleUser;
+            }
+        },
+        isGoogleUser: { type: Boolean, required: true, default: false }
     }
 )
 

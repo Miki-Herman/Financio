@@ -13,6 +13,7 @@ const categoryRouter = require("./routes/categoryRoute")
 const userAuthRouter = require("./routes/userAuthRoute")
 
 app.use(cors());
+app.use(express.json());
 
 // connect to DB
 connectDB();

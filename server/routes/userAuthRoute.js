@@ -4,7 +4,52 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
+const { OAuth2Client } = require('google-auth-library');
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 require('dotenv').config();
+
+async function verifyGoogleToken(token) {
+    const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: GOOGLE_CLIENT_ID,
+    });
+    return ticket.getPayload();
+}
+
+router.post('/google-login', async (req, res) => {
+    try {
+        const payload = await verifyGoogleToken(req.body.token);
+        let user = await User.findOne({ email: payload.email });
+
+        if (!user) {
+            user = new User({
+                email: payload.email,
+                googleId: payload.sub,  // Google's unique ID for the user
+                isGoogleUser: true      // Flag indicating this is a Google user
+            });
+            await user.save();
+        }
+
+        // Generate a token for the user
+        const expirationDuration = 60 * 60; // 1 hour
+        const expirationTimestamp = Math.floor(Date.now() / 1000) + expirationDuration;
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role, email: user.email, exp: expirationTimestamp },
+            process.env.JWT_SECRET
+        );
+
+        res.status(200).json({
+            message: 'Successfully authenticated',
+            userToken: token,
+            expiresAt: expirationTimestamp
+        });
+    } catch (error) {
+        console.error('Error verifying Google token:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 router.use(express.json());
 
@@ -56,24 +101,16 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'Email already registered' });
         }
 
-        // Check if the id is already in use
-        const existingUserById = await User.findOne({ id: req.body.id });
-        if (existingUserById) {
-            return res.status(400).json({ message: 'ID already in use' });
-        }
-
-
+        // Hash the password
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
         const user = new User({
             email: req.body.email,
-            password: hashedPassword,
-            id: req.body.id,
-            role: req.body.role
+            password: hashedPassword
         });
         const savedUser = await user.save();
 
-        res.status(201).json({ email: savedUser.email, _id: savedUser._id });
+        res.status(201).json({ email: savedUser.email, id: savedUser._id });
     } catch (error) {
         console.error('Error registering new user:', error);
         res.status(500).json({ message: 'Internal server error' });
