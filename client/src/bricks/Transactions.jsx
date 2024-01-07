@@ -122,8 +122,8 @@ const Transactions = () => {
       console.error('Chyba při mazání transakce:', error);
     }
   };
-
-  const freeMoney = () => {
+ 
+  const freeMoney = () => { 
     if (!transactionData || transactionData.length === 0) {
       return 0; // Pokud transactionData není definována nebo je prázdná, vrátíme 0
     }

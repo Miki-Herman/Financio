@@ -7,7 +7,7 @@ router.use(express.json());
 
 router.get("/get", async (req, res) => {
     try {
-      const userId = req.body.userId;
+      const userId = req.query.userId;
   
       console.log("Před dotazem do databáze, userId:", userId);
 
@@ -16,14 +16,14 @@ router.get("/get", async (req, res) => {
 
       console.log("Po dotazu do databáze");
   
-      if (!userSavingGoal) {
+      if (userSavingGoal.length === 0) {
         console.log("Nenalezen žádný savingGoal");
         return res.status(404).json({ message: 'Saving goal not found for the user' });
       }
   
       console.log("Nalezen savingGoal:", userSavingGoal);
       res.json({
-        userSavingGoal: userSavingGoal
+        userSavingGoal
       });
     } catch (error) {
       console.error(error);
@@ -98,7 +98,7 @@ router.post("/edit", async (req, res) => {
 
 router.delete("/delete", async (req, res) => {
     try {
-        const { id } = req.body;
+        const { id } = req.query;
 
         if (!id) {
             return res.status(400).json({ message: 'id is required in the request body' });
