@@ -4,6 +4,7 @@ import Register from './bricks/Register'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from "./Routes/Home"
+import NotFound from "./Routes/404"
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Register/>}/>
           <Route path="/home" Component={Home}/>
+          <Route path="/404" Component={NotFound}/>
         </Routes>
       </Router>
     </div>
