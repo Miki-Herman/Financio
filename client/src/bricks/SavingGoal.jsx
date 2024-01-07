@@ -11,7 +11,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 function SavingGoal() {
 
-    const [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true) 
     const [dataGet, setDataGet] = useState()
     const [showModal, setShowModal] = useState(false);
     const [mode, setMode] = useState(null);

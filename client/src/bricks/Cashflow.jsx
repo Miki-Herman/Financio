@@ -1,56 +1,98 @@
-import React from "react";
-import Categories from "../mockData/category"
-import Icon from '@mdi/react';
-import { PureComponent } from "react";
-import Stack from "react-bootstrap/Stack"
-import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React , { useState, useEffect } from "react";
 import "../css/Cashflow.css"
+import ReactECharts from 'echarts-for-react';
 
 function Cashflow() {
 
-    //<Stack direction="horizontal" gap={5}>
-    //{Categories.map((item) => (
-        //<div key={item.id}>
-        //<p>{item.name}</p>
-        //<Icon path={item.icon} color={item.color} size={1}></Icon>
-        //</div>
-    //))}
-   //</Stack> 
-   const Mock = [{
-    Income: 3500,
-    Groceries: 750,
-    Transport: 200,
-    Housing: 550,
-    Health: 150
-   }]
+
+  const [dataGet, setDataGet] = useState([]) 
+
+  useEffect(() => {
+    fetchData('http://localhost:4000/graph/get').then((data) => {
+        setDataGet(data.graph)
+        console.log(data.graph)
+        });
+}, []);
+
+const fetchData = async (url) => {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Chyba při získávání dat');
+      }
+
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error('Chyba při získávání dat:', error);
+      return [];
+    }
+  };
+
+  const option = {
+      tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)',
+      },
+      series: [
+          {
+              name: 'Category',
+              type: 'pie',
+              radius: ['40%', '70%'],
+              center: ['50%', '50%'],
+              itemStyle: {
+                  borderRadius: 10,
+                  borderColor: '#fff',
+                  borderWidth: 2
+              },
+              data: dataGet,
+              label: {
+                show: false,
+                position: 'center'
+              },
+              emphasis: {
+                label: {
+                  show: true,
+                  fontSize: 20,
+                  fontWeight: 'bold'
+                }
+              },
+              labelLine: {
+                show: false
+              },
+          },
+      ],
+  };
 
     return (
         <div className="Cashflow">
             <h1>Graph</h1>
-        <BarChart
-          name="Cashflow"
-          width={300}
-          height={400}
-          data={Mock}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid/>
-
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="Income" fill="#8884d8" />
-          <Bar dataKey="Housing" stackId="a" fill="#82ca9d" />
-          <Bar dataKey="Transport" stackId="a" fill="red" />
-          <Bar dataKey="Groceries" stackId="a" fill="gold" />
-          <Bar dataKey="Health" stackId="a" fill="pink" />
-        </BarChart>
-      </div>
+            <ReactECharts option={option} style={{ height: '400px' }} />
+        </div>
     )
 }
 
 export default Cashflow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
