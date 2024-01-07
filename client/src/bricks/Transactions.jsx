@@ -1,128 +1,238 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import Category from "./categories"
-import Categories from "../mockData/category"
 import "../css/Transactions.css"
 import Icon from '@mdi/react';
-import { mdiCreditCardPlusOutline, mdiSquareEditOutline, mdiTrashCanOutline } from '@mdi/js';
+import { mdiCreditCardPlusOutline, mdiSquareEditOutline, mdiTrashCanOutline} from '@mdi/js';
 import {Table, Button, Modal, Form, Stack} from "react-bootstrap"
+import toast, { Toaster } from 'react-hot-toast';
+import * as mdiIcons from "@mdi/js";
 
 
-function Transactions() {
+const Transactions = () => {
+  const [transactionData, setTransactionData] = useState();
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [categoryData, setCategoryData] = useState([]);
+  const [mode, setMode] = useState(null);
+  const [editAmount, setEditAmount] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editDate, setEditDate] = useState('')
+  const [selectedDate, setSelectedDate] = useState('');
+  const [editId, setEditId] = useState('')
+  const [editTransaction, setEditTransaction] = useState({
+    amount: 0,
+    category: '',
+    description: '',
+    id: '',
+    date: ''
+  });
 
-    const [transactionData, setTransactionData] = useState([
-        {
-            "id": "1",
-            "amount": 250,
-            "category": "Transport",
-            "description": "Washing my car",
-            "date": "2023-11-27T18:00:00Z"
-        },
-        {
-            "id": "2",
-            "amount": 500,
-            "category": "Groceries",
-            "description": "Groceries",
-            "date": "2023-11-27T18:00:00Z"
-        },
-        {
-            "id": "3",
-            "amount": 1500,
-            "category": "Housing",
-            "description": "Rent",
-            "date": "2023-11-27T18:00:00Z"
-        },
-        {
-            "id": "4",
-            "amount": 10000,
-            "category": "Income",
-            "description": "Income",
-            "date": "2023-11-28T18:00:00Z"
-        },
-    ])
-    const [showEditModal, setShowEditModal] = useState(false); 
-    const closeEditModal = () => setShowEditModal(false);
-    const openEditModal = (item) => {
-        setEditTransaction(item); 
-        setShowEditModal(true); 
-    };
-
-    const [mode, setMode] = useState(null)
-    
-    const [editAmount, setEditAmount] = useState();
-    const [editCategory, setEditCategory] = useState("");
-    const [editDescription, setEditDescription] = useState("");
-
-    const [editTransaction, setEditTransaction] = useState({
-        amount: 0,
-        category: "",
-        description: "",
+  useEffect(() => {
+    fetchData('http://localhost:4000/transaction/list?userId=2').then((data) => {
+      setTransactionData(data.data);
+      console.log(data.data)
     });
 
-    const updateTransaction = () => {
-        const updatedTransactions = transactionData.map((item) => {
-            if (item.id === editTransaction.id) {
-                return {
-                    ...item,
-                    amount: editAmount || item.amount,
-                    category: editCategory || item.category,
-                    description: editDescription || item.description
-                };
-            }
-            return item;
+    fetchCategories('http://localhost:4000/category/list').then((categories) => {
+      setCategoryData(categories);
+    });
+  }, []);
+
+  const fetchData = async (url) => {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Chyba při získávání dat');
+      }
+
+      const responseData = await response.json();
+      return responseData;
+    } catch (error) {
+      console.error('Chyba při získávání dat:', error);
+      return [];
+    }
+  };
+
+  const fetchCategories = async (url) => {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Chyba při získávání kategorií');
+      }
+
+      const responseData = await response.json();
+      return responseData.types;
+    } catch (error) {
+      console.error('Chyba při získávání kategorií:', error);
+      return [];
+    }
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+    setMode(null);
+    
+  };
+
+  const openEditModal = (item) => {
+    setEditTransaction(item);
+    setShowEditModal(true);
+    setSelectedDate(null)
+    
+  };
+
+
+  const deleteItem = async (idToDelete) => {
+    try {
+      const url= `http://localhost:4000/transaction/delete?id=${idToDelete}`;
+  
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log(idToDelete)
+  
+      if (response.ok) {
+        fetchData('http://localhost:4000/transaction/list?userId=2').then((data) => {
+          setTransactionData(data.data);
+          console.log(data.data)
         });
-
-        setTransactionData(updatedTransactions); 
-        setShowEditModal(false);
+          toast.success('Successfully deleted!')
+      } else {
+        toast.error("This didn't work.")
+        throw new Error('Chyba při mazání transakce');
+      }
+    } catch (error) {
+        toast.error("This didn't work.")
+      console.error('Chyba při mazání transakce:', error);
     }
+  };
 
-    const deleteItem = (id) => {
-        const updatedTransactions = transactionData.filter(transaction => transaction.id !== id);
-        setTransactionData(updatedTransactions);
+  const freeMoney = () => {
+    if (!transactionData || transactionData.length === 0) {
+      return 0; // Pokud transactionData není definována nebo je prázdná, vrátíme 0
     }
+    const result = transactionData.reduce((now, item) => {
+      return item.category === 'Income' ? now + item.amount : now - item.amount;
+    }, 0);
 
-    const freeMoney = (transactionData) => {
-        const result = transactionData.reduce((now, item) => {
-        return item.category === "Income" ? now + item.amount : now - item.amount;
-        }, 0)
+    return result;
+  };
 
-        return result
-    }
-    const totalAmount = freeMoney(transactionData)
+  const totalAmount = freeMoney();
 
-    const createTransaction = async () => {
-        try {
-          const dToIn = {
-            amount: editAmount,
-            category: editCategory,
-            description: editDescription,
-            id: 1,
-            userId: 2,
-            date: new Date()
-          };
-      
-          const response = await fetch('http://localhost:4000/transaction/create', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dToIn),
-          });
+  const createTransaction = async () => {
 
-          console.log(dToIn)
-      
-          if (response.ok) {
-            closeEditModal();
-            setMode(null);
-          } else {
-            throw new Error('Chyba při aktualizaci transakce');
-          }
-        } catch (error) {
-          console.error('Chyba při aktualizaci transakce:', error);
-        }
+    
+    try {
+      const dToIn = {
+        amount: editAmount,
+        category: editCategory,
+        description: editDescription,
+        id: Math.random().toString(),
+        userId: 2,
+        date: selectedDate
       };
 
-    return(
-        <div className="Transactions">
+      console.log(dToIn)
+  
+      const response = await fetch('http://localhost:4000/transaction/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dToIn),
+      });
+
+      console.log(dToIn)
+  
+      if (response.ok) {
+        fetchData('http://localhost:4000/transaction/list?userId=2').then((data) => {
+          setTransactionData(data.data);
+          console.log(data.data)
+        });
+        closeEditModal();
+        setMode(null);
+        toast.success('Successfully added!')
+      } else {
+        toast.error("This didn't work.")
+        throw new Error('Chyba při aktualizaci transakce');
+      }
+    } catch (error) {
+        toast.error("This didn't work.")
+      console.error('Chyba při aktualizaci transakce:', error);
+    }
+  };
+
+  const updateTransaction = async () => {
+    try {
+      const dToIn = {
+        amount: editAmount,
+        category: editCategory,
+        description: editDescription,
+        id: editId,
+        userId: 2,
+        date: selectedDate
+      };
+  
+      const response = await fetch('http://localhost:4000/transaction/edit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dToIn),
+      });
+
+      console.log(dToIn)
+  
+      if (response.ok) {
+        fetchData('http://localhost:4000/transaction/list?userId=2').then((data) => {
+          setTransactionData(data.data);
+          console.log(data.data)
+        });
+        closeEditModal();
+        setMode(null);
+        toast.success('Successfully changed!')
+      } else {
+        toast.error("This didn't work.");
+        throw new Error('Chyba při aktualizaci transakce');
+      }
+    } catch (error) {
+        toast.error("This didn't work.");
+      console.error('Chyba při aktualizaci transakce:', error);
+    }
+  }
+
+  
+
+  const handleDateChange = (e) => {
+    const selectedValue = e.target.value
+    const selectedISODate = `${selectedValue}T00:00:00.000Z`
+    setSelectedDate(selectedISODate);
+  };
+
+
+  return (
+    <div className="Transactions">
+        <Toaster
+  position="top-center"
+  reverseOrder={false}
+/>
             <Stack direction="horizontal">
                 <h1>This month</h1>
                 <h2 className="p-2 ms-auto">Useable finances: <span style={{color: totalAmount >= 0 ? ("green") : ("red")}}>{totalAmount} Kč</span></h2>
@@ -134,20 +244,45 @@ function Transactions() {
                         <th><h4>Category</h4></th>
                         <th><h4>Description</h4></th>
                         <th><h4>Date</h4></th>
-                        <th className="Actions"><Button variant="success" onClick={() => {openEditModal(); setMode("add")}}><Icon path={mdiCreditCardPlusOutline} size={1} /></Button ></th>
+                        <th className="Actions"><Button variant="success" onClick={() => {openEditModal(); setMode("add"); }}><Icon path={mdiCreditCardPlusOutline} size={1} /></Button ></th>
                     </tr>
-                {transactionData.map((item) => (
-                    <tr key={item.id}>
-                        {item.category === "Income" ? (<td style={{color: "green"}}>+{item.amount} Kč</td>) : (<td style={{color: "red"}}>- {item.amount} Kč</td>) }
-                        <td><Category category={item.category}/></td>
-                        <td>{item.description}</td>
-                        <td>{new Date(item.date).toLocaleDateString()}</td>
-                        <td className="Actions">
-                            <Button className="Button" variant="primary" onClick={() => {openEditModal(item); setMode("edit")}}><Icon path={mdiSquareEditOutline} size={1} /></Button>
+                    {transactionData &&
+          transactionData.map((item) => {
+            const targetCategory = categoryData.find(
+              (category) => category.name === item.category
+            );
+            const categoryIconName = targetCategory
+            ? targetCategory.icon
+            : null;
+
+                          
+                          const IconComponent = categoryIconName
+                          ? mdiIcons[categoryIconName] 
+                          : null;
+
+                          const categoryColor = targetCategory ? targetCategory.color : null;
+
+            return (
+              <tr key={item.id}>
+                {item.category === "Income" ? (
+                  <td style={{ color: "green" }}>+{item.amount} Kč</td>
+                ) : (
+                  <td style={{ color: "red" }}>- {item.amount} Kč</td>
+                )}
+                  <td>
+                    {IconComponent && categoryColor && (
+                      <><Icon path={IconComponent} size={1} color={categoryColor} /> {item.category}</>
+                    )}
+                  </td>
+                <td>{item.description}</td>
+                <td>{new Date(item.date).toLocaleDateString()}</td>
+                <td className="Actions">
+                            <Button className="Button" variant="primary" onClick={() => {openEditModal(item); setMode("edit"); setEditId(item.id)}}><Icon path={mdiSquareEditOutline} size={1} /></Button>
                             <Button className="Button" variant="danger" onClick={() => deleteItem(item.id)}><Icon path={mdiTrashCanOutline} size={1} /></Button>
                         </td>
-                    </tr>
-                ))}
+              </tr>
+            );
+          })}
                 </thead>
             </Table>
         
@@ -166,14 +301,17 @@ function Transactions() {
                         <Form.Label>Category</Form.Label>
                         <Form.Select onChange={(e) => setEditCategory(e.target.value)}>
                             <option />
-                        {Categories.map((item) => (
+                        {categoryData.map((item) => (
                                 <option value={item.name}> {item.name} </option>
-                            ))}
+                        ))}
                         </Form.Select>
                         <Form.Label>Description</Form.Label>
                         <Form.Control placeholer="Description" onChange={(e) => setEditDescription(e.target.value)}></Form.Control>
+                        <Form.Label>Date</Form.Label>
+                        <input type="date" className="datum" onChange={handleDateChange}></input>
                     </Form.Group>
                 </Form>
+                
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={closeEditModal}>Cancel</Button>
@@ -185,7 +323,7 @@ function Transactions() {
             </Modal.Footer>
         </Modal>
         </div>
-    )
-}
+  );
+};
 
-export default Transactions
+export default Transactions;

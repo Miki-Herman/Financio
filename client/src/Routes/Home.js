@@ -5,13 +5,13 @@ import SavingGoal from "../bricks/SavingGoal"
 import Overview from "../bricks/Overview"
 import UpcomingPayments from "../bricks/UpcomingPayments"
 import Button from "react-bootstrap/Button"
-import { Container, Row, Col } from "react-bootstrap"
+import { Container, Row, Col, Stack } from "react-bootstrap"
 
 function Home() {
 
     return( 
         <div>
-            <Button variant="primary">Logout</Button>
+            <Stack direction="horizontal"><Button variant="primary">Logout</Button></Stack>
             <Transactions/>
             <SavingGoal/>
             <Container fluid>
