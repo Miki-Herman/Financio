@@ -51,10 +51,13 @@ router.get("/get", async (req, res) => {
             const categoryAmount = categoryTransactions.reduce((total, transaction) => total + transaction.amount, 0);
 
             // Přidáme do grafu
+            if (category === "Income") {} else
             graph.push({
-                category: category,
-                color: color,
-                amount: categoryAmount
+                value: categoryAmount,
+                name: category,
+                itemStyle: {
+                    color: color
+                }
             });
         }
 
