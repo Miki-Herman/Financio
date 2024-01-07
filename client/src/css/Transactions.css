@@ -42,3 +42,11 @@
     font-family: 'Chakra Petch', sans-serif;
     font-weight: 600;
 }
+
+.datum {
+    color: black;
+    width: 100%;
+    border: solid lightgray 1px;
+    border-radius: 5px;
+    padding: 8px
+}

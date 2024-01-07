@@ -62,7 +62,7 @@ router.post("/edit", async (req, res) => {
         "amount": dtoIn.amount,
         "category": dtoIn.category,
         "description": dtoIn.description,
-        "date": date,
+        "date": dtoIn.date,
         "userId": dtoIn.userId
     }
 
