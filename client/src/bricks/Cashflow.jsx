@@ -35,14 +35,14 @@ const fetchData = async (url) => {
     }
   };
 
-  const option = {
+  const option = { 
       tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)',
       },
       series: [
           {
-              name: 'Category',
+              name: 'Category info',
               type: 'pie',
               radius: ['40%', '70%'],
               center: ['50%', '50%'],
