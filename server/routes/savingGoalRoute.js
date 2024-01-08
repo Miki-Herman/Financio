@@ -1,7 +1,9 @@
 const express = require('express');
 const SavingGoal = require('../models/savingGoal');
 const router = express.Router();
-
+const isNumeric = (value) => {
+    return !isNaN(parseFloat(value)) && isFinite(value);
+};
 
 router.use(express.json());
 
@@ -34,13 +36,26 @@ router.get("/get", async (req, res) => {
 
 
 
+
+
 router.post("/create", async (req, res) => {
     try {
-       
         const { id, goal } = req.body;
         const userId = req.body.userId;
-        if (!id || !goal) {
-            return res.status(400).json({ message: 'Both id and goal are required in the request body' });
+
+        if (!id || !goal || !userId) {
+            return res.status(400).json({ message: 'id, goal, and userId are required in the request body' });
+        }
+
+        if (!isNumeric(goal) || parseFloat(goal) <= 0) {
+            return res.status(400).json({ message: 'goal must be a positive and non-zero number' });
+        }
+
+        // Check if the user already has a saving goal
+        const existingSavingGoal = await SavingGoal.findOne({ userId: userId });
+
+        if (existingSavingGoal) {
+            return res.status(400).json({ message: 'User already has a saving goal' });
         }
 
         console.log("Před vytvořením nového savingGoal");
@@ -48,8 +63,8 @@ router.post("/create", async (req, res) => {
         const newSavingGoal = new SavingGoal({
             id: id,
             goal: goal,
-            userId:userId,
-            saved:0
+            userId: userId,
+            saved: 0
         });
 
         await newSavingGoal.save();
@@ -63,14 +78,16 @@ router.post("/create", async (req, res) => {
     }
 });
 
-
-
 router.post("/edit", async (req, res) => {
     try {
         const { id, newGoal } = req.body;
 
         if (!id || !newGoal) {
             return res.status(400).json({ message: 'Both id and newGoal are required in the request body' });
+        }
+
+        if (!isNumeric(newGoal) || parseFloat(newGoal) <= 0) {
+            return res.status(400).json({ message: 'newGoal must be a positive and non-zero number' });
         }
 
         console.log("Před úpravou savingGoal");
@@ -94,6 +111,7 @@ router.post("/edit", async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 router.delete("/delete", async (req, res) => {
